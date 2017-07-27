@@ -1,0 +1,15 @@
+[Unit]
+Description=FAUST CTF Dildo Training Server
+
+[Service]
+ExecStart=/usr/bin/java -jar doedel.jar
+WorkingDirectory=/srv/doedel/
+User=doedel
+CPUAccounting=yes
+CPUQuota=10%
+MemoryAccounting=yes
+MemoryLimit=750M
+LimitNPROC=100
+
+[Install]
+WantedBy=multi-user.target

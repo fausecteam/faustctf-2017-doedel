@@ -1,0 +1,108 @@
+* Design
+
+- DildO Excitement Data Extraction Library
+
+- Verschiedene Sockets für verschiedene Zwecke:
+  - Status (vulnerable)
+  - Data
+
+- Der Server connectet sich auf alle
+- Die Daten die übergeben werden sind EDN encoded
+- Die Flaggen werden über Data ein und ausgegeben
+
+** Datenformate
+
+*** Status-Anfrage
+
+Client ⇒ Server ✓
+#+BEGIN_SRC lang:clojure
+{ :request-type :status }
+#+END_SRC
+Server ⇒ Client
+#+BEGIN_SRC lang:clojure
+{ :response-type :status
+  :clojure-version 1.7
+  :hostname "vulnbox"
+  :banner
+ "____                      _  
+ (|   \             |      | | 
+  |    | __   _   __|   _  | | 
+ _|    |/  \_|/  /  |  |/  |/  
+(/\___/ \__/ |__/\_/|_/|__/|__/" }
+  
+#+END_SRC
+
+*** Data Input-Anfrage
+
+Als erstes wird ein Nutzer registriert.
+
+Client ⇒ Server ✓
+#+BEGIN_SRC lang:clojure
+{ :request-type :register-user
+  :user-id "WetGirl21"
+  :security-token "FLAG_GWofrp0059cu1cBSpgOBX0t0tZjzZS1j" }
+#+END_SRC
+Server ⇒ Client ✓
+#+BEGIN_SRC lang:clojure
+{ :response-type :success
+  :user-id "WetGirl21" }
+#+END_SRC
+
+Dann werden Patterns geholt.
+
+Client ⇒ Server ✓
+#+BEGIN_SRC lang:clojure
+{ :request-type :get-patterns
+  :user-id "WetGirl21" }
+#+END_SRC
+Server ⇒ Client ✓
+#+BEGIN_SRC lang:clojure
+{ :response-type :vibrate
+  :security-token "FLAG_GWofrp0059cu1cBSpgOBX0t0tZjzZS1j"
+  :patterns ["HLHLLH", "LHLLHH", "HLHHLH"] }
+#+END_SRC
+
+Die Excitation-Daten für die Patterns werden übertragen
+
+Client ⇒ Server ✓
+#+BEGIN_SRC lang:clojure
+{ :request-type :send-data
+  :user-id "WetGirl21"
+  :excitement-level 12.3
+  :pattern "HLHLLH" }
+#+END_SRC
+Server ⇒ Client ✓
+#+BEGIN_SRC lang:clojure
+{ :response-type :success
+  :security-token "FLAG_GWofrp0059cu1cBSpgOBX0t0tZjzZS1j" }
+#+END_SRC
+
+Das beste Pattern wird ausgewählt und vibriert.
+
+Client ⇒ Server ✓
+#+BEGIN_SRC lang:clojure
+{ :request-type :get-best-pattern
+  :user-id "WetGirl21" }
+#+END_SRC
+Server ⇒ Client ✓
+#+BEGIN_SRC lang:clojure
+{ :response-type :vibrate
+  :pattern "HLHLLH"
+  :security-token "FLAG_GWofrp0059cu1cBSpgOBX0t0tZjzZS1j" }
+#+END_SRC
+
+* Vulnerability
+
+- Auf dem Status Port werden die Nachrichten nicht mit edn/read sondern mit clojure.core/read eingelesen
+- Das entspricht einer RCE auf Clojure-Ebene
+- Zwar werden die S-Expressions nicht ausgeführt, aber Macros, Reader-Macros, und Constructor-Syntax
+
+#+BEGIN_SRC lang:clojure
+#=(println "HAXXORD")
+#java.lang.Object[]
+#+END_SRC
+
+** Mögliche Variante
+
+- Unter Clojure 1.4 oder jünger verhindert *read-eval* nicht die Verwendung von Constructor-Syntax
+Siehe https://deadcode.me/blog/2016/09/02/Blind-Java-Deserialization-Commons-Gadgets.html#server

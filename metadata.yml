@@ -1,0 +1,16 @@
+name: doedel
+author:
+    - Baron
+packages:
+    - build-essential
+    - openjdk-7-jdk
+    - openjdk-7-jre
+checker:
+    module: doedel
+    class: DoedelChecker
+    packages:
+        - python3-requests
+        - python3-ply
+        - python3-rfc3339
+        - python3-tz
+        - python3-yaml

@@ -1,0 +1,25 @@
+For the checkerscript: You can either have a directory that also is a
+python module (as the example here) or a single python file. If you
+need any auxiliary data, use the python module and place the data in
+that directory:
+
+checker/
+ helloworld.py
+
+or
+
+checker/
+  helloworld
+  ├── __init__.py
+  ├── mychecker.py
+  ├── someimage.jpg
+  ├── somescript.pl  
+  └── somfile.json
+
+The one and only language is python3. You can still use other
+languages after consulting with the core team by placing a script in
+there and calling that from python.
+
+In any way the required interface is:
+
+from $servicename import ServiceNameChecker
